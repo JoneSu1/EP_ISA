@@ -1,3 +1,4 @@
+raise ImportError("Deprecated. Ep_ISA loads pretrained models via load_checkpoint().")
 import os
 from Ep_ISA.modeling.trainer import Trainer
 import numpy as np

@@ -1,3 +1,4 @@
+raise ImportError("Deprecated. Ep_ISA uses external TF/Keras models via define_model().")
 import torch
 from torch import nn
 import torch.nn.functional as F

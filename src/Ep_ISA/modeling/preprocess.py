@@ -1,3 +1,4 @@
+raise ImportError("Deprecated. Ep_ISA consumes Fi-NeMo hits via load_finemo().")
 import pandas as pd
 import bioframe as bf
 from loguru import logger

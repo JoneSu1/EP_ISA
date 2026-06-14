@@ -1,3 +1,4 @@
+raise ImportError("Deprecated. Ep_ISA does not train models internally.")
 import os
 import math
 import torch

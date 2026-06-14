@@ -128,6 +128,8 @@ def run_single_isa(
         fasta=bf.load_fasta(fasta)
         
     regions = pd.read_csv(motif_locs_path)["region"].unique().tolist()
+    non_motif_regions = pd.read_csv(non_motif_locs_path)["region"].unique().tolist()
+    regions = list(set(regions + non_motif_regions))
     
     logger.info("Computing original predictions for all regions")
     get_pred_orig(
