@@ -181,10 +181,11 @@ def _validate_peak_ids(df, region_map):
     map_ids = set(region_map.keys())
     missing = hit_ids - map_ids
     if missing:
-        examples = sorted(list(missing))[:5]
-        raise ValueError(
-            f"{len(missing)} peak_ids in hits not found in region_map. "
-            f"Examples: {examples}. Ensure df_regions covers all Fi-NeMo peaks.")
+        n_before = len(df)
+        df.drop(df[df['peak_id'].apply(lambda x: int(x) if pd.notna(x) else -1).isin(missing)].index, inplace=True)
+        logger.warning(
+            f"{len(missing)} peak_ids in hits not in region_map (filtered). "
+            f"Hits: {n_before} -> {len(df)}. Use full df_regions for complete analysis.")
 
 
 def compute_non_motif_regions(df_motif_locs, region_map, flank=5, min_len=4, max_len=500):

@@ -115,7 +115,7 @@ def sample_null_kmers(
         if k <= 0: continue
 
         eligible = df[df["interval_len"] >= k]
-        chosen = eligible.sample(n=need).copy()
+        chosen = eligible.sample(n=need, replace=True).copy()
         high_bounds = chosen["interval_len"] - k + 1
         offsets = rng.integers(0, high_bounds)
         chosen["start"] = chosen["start"]+ offsets
@@ -132,7 +132,7 @@ def sample_null_kmers(
     elif len(out) < n_samples:
         # Top up from already sampled rows (keeps approximate matched distribution).
         if len(out) > 0:
-            topup = out.sample(n=n_samples - len(out))
+            topup = out.sample(n=n_samples - len(out), replace=True)
             out = pd.concat([out, topup], ignore_index=True)
 
     return out.reset_index(drop=True)
