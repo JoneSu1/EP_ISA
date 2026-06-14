@@ -294,21 +294,27 @@ class EpQuickStart:
     def report(self):
         logger.info("Generating comprehensive reports and plots...")
 
+        def safe(fn, *args, **kwargs):
+            try:
+                fn(*args, **kwargs)
+            except Exception as e:
+                logger.warning(f"Skipped {fn.__name__}: {e}")
+
         if os.path.exists(self.files["isa_combi"]):
             df_isa_combi = pd.read_csv(self.files["isa_combi"])
         else:
             df_isa_combi = None
 
         if os.path.exists(self.files["null_isa"]):
-            plot_null_isa(self.files["null_isa"], tracks=self.tracks,
-                          outpath=os.path.join(self.plots_dir, "null_isa.png"))
+            safe(plot_null_isa, self.files["null_isa"], tracks=self.tracks,
+                 outpath=os.path.join(self.plots_dir, "null_isa.png"))
         if os.path.exists(self.files["null_interaction"]):
-            plot_null_interaction(self.files["null_interaction"],
-                                  tracks=self.tracks,
-                                  outpath=os.path.join(self.plots_dir, "null_interaction.png"))
+            safe(plot_null_interaction, self.files["null_interaction"],
+                 tracks=self.tracks,
+                 outpath=os.path.join(self.plots_dir, "null_interaction.png"))
         if df_isa_combi is not None:
-            plot_interaction_decay(df_isa_combi, self.tracks, mode='signed',
-                                   outpath=os.path.join(self.plots_dir, "interaction_decay_signed.png"))
+            safe(plot_interaction_decay, df_isa_combi, self.tracks, mode='signed',
+                 outpath=os.path.join(self.plots_dir, "interaction_decay_signed.png"))
 
         for t in self.tracks:
             t_suffix = f"_t{t}"
@@ -328,34 +334,33 @@ class EpQuickStart:
             df_coop_tf = pd.read_csv(coop_tf_path)
             df_imp = pd.read_csv(imp_path) if os.path.exists(imp_path) else None
 
-            hist_coop_score(df_coop_pair, outpath=ppath("coop_score_hist"))
-            heatmap_coop_score(df_coop_pair, outpath=ppath("coop_score_heatmap"))
-            plot_motif_distance_by_category(df_coop_pair, outpath=ppath("distance_by_category"))
+            safe(hist_coop_score, df_coop_pair, outpath=ppath("coop_score_hist"))
+            safe(heatmap_coop_score, df_coop_pair, outpath=ppath("coop_score_heatmap"))
+            safe(plot_motif_distance_by_category, df_coop_pair, outpath=ppath("distance_by_category"))
 
-            plot_motif_gc_by_coop(df_coop_tf, outpath=ppath("motif_gc_by_coop"))
+            safe(plot_motif_gc_by_coop, df_coop_tf, outpath=ppath("motif_gc_by_coop"))
             if df_imp is not None:
-                plot_coop_vs_importance(df_coop_tf, df_imp,
-                                        x_col="coop_score",
-                                        y_col=f"mean_isa_t{t}",
-                                        outpath=ppath("coop_vs_importance"))
-            plot_partner_specificity(df_coop_pair, df_coop_tf,
-                                     outpath=ppath("partner_specificity_ratio"))
+                safe(plot_coop_vs_importance, df_coop_tf, df_imp,
+                     x_col="coop_score", y_col=f"mean_isa_t{t}",
+                     outpath=ppath("coop_vs_importance"))
+            safe(plot_partner_specificity, df_coop_pair, df_coop_tf,
+                 outpath=ppath("partner_specificity_ratio"))
 
-            plot_coop_by_tf_pair_family(df_coop_pair, outpath=ppath("family_coop_summary"))
-            plot_coop_by_dbd(df_coop_tf, outpath=ppath("dbd_coop_summary"))
-            plot_intra_family_coop_score(df_coop_pair, outpath=ppath("intra_family_distribution"))
+            safe(plot_coop_by_tf_pair_family, df_coop_pair, outpath=ppath("family_coop_summary"))
+            safe(plot_coop_by_dbd, df_coop_tf, outpath=ppath("dbd_coop_summary"))
+            safe(plot_intra_family_coop_score, df_coop_pair, outpath=ppath("intra_family_distribution"))
 
-            plot_usf_pfs(df_coop_tf, outpath=ppath("usf_pioneer_ecdf"))
-            plot_cell_specificity(df_coop_tf, outpath=ppath("rolling_gini_specificity"))
+            safe(plot_usf_pfs, df_coop_tf, outpath=ppath("usf_pioneer_ecdf"))
+            safe(plot_cell_specificity, df_coop_tf, outpath=ppath("rolling_gini_specificity"))
 
-            plot_ppi_enrichment(df_coop_pair, rank_by="coop_score",
-                                outpath=ppath("ppi_enrichment_by_coop_score"))
-            plot_ppi_enrichment(df_coop_pair, rank_by="p_val",
-                                outpath=ppath("ppi_enrichment_by_p_val"))
-            plot_cofactor_recruitment(df_coop_pair, outpath=ppath("ppi_violin_validation"))
-            plot_dna_mediated_ppi(df_coop_pair, rank_by="coop_score",
-                                  outpath=ppath("dna_ppi_enrichment_by_score"))
-            plot_dna_mediated_ppi(df_coop_pair, rank_by="p_val",
-                                  outpath=ppath("dna_ppi_enrichment_by_pval"))
+            safe(plot_ppi_enrichment, df_coop_pair, rank_by="coop_score",
+                 outpath=ppath("ppi_enrichment_by_coop_score"))
+            safe(plot_ppi_enrichment, df_coop_pair, rank_by="p_val",
+                 outpath=ppath("ppi_enrichment_by_p_val"))
+            safe(plot_cofactor_recruitment, df_coop_pair, outpath=ppath("ppi_violin_validation"))
+            safe(plot_dna_mediated_ppi, df_coop_pair, rank_by="coop_score",
+                 outpath=ppath("dna_ppi_enrichment_by_score"))
+            safe(plot_dna_mediated_ppi, df_coop_pair, rank_by="p_val",
+                 outpath=ppath("dna_ppi_enrichment_by_pval"))
 
-        logger.info(f"Report complete. All plots saved to {self.plots_dir}")
+        logger.info(f"Report complete. Plots saved to {self.plots_dir}")

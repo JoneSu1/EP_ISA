@@ -209,7 +209,7 @@ def compute_non_motif_regions(df_motif_locs, region_map, flank=5, min_len=4, max
         else:
             motif_mask = pd.DataFrame(columns=['chrom', 'start', 'end'])
 
-        non_motif = bf.subtract(region_row, motif_mask)
+        non_motif = region_row.copy() if motif_mask.empty else bf.subtract(region_row, motif_mask)
         if non_motif.empty:
             continue
         non_motif = non_motif[['chrom', 'start', 'end']].copy()
